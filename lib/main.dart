@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:first_project/calculator_basic.dart';
+import 'package:first_project/explore_tab.dart';
 
 void main() => runApp(MyApp());
 
@@ -27,7 +28,9 @@ class MyHomePage extends StatelessWidget{
       child: Scaffold(
         appBar: AppBar(
           title: Text("Application"),backgroundColor: Colors.blue,
-          leading: IconButton(onPressed: (){},
+          leading: IconButton(onPressed: (){
+            Scaffold.of(context).openDrawer();
+          },
               icon: Icon(Icons.menu)), foregroundColor: Colors.white,
           actions: <Widget>[
             IconButton(onPressed: (){},
@@ -45,8 +48,8 @@ class MyHomePage extends StatelessWidget{
 
           tabs: [
             Tab(icon: Icon(Icons.travel_explore), text: "Explore",),
-            Tab(icon: Icon(Icons.calculate), text: "Calculator",),
-            Tab(icon: Icon(Icons.family_restroom), text: "Team",),
+             Tab(icon: Icon(Icons.calculate), text: "Calculator",),
+            Tab(icon: Icon(Icons.family_restroom), text: "Team",) ,
             ],unselectedLabelColor: Color(0xffffffff),
               labelColor: Color(0xff00aaee),
           ),
@@ -54,22 +57,37 @@ class MyHomePage extends StatelessWidget{
         ),
         body: TabBarView(
           children: [
-            exploreTab(), // Call exploreTab() to get the Widget it returns
+            ExploreTab(), // Call exploreTab() to get the Widget it returns
             DashBoardTab(),
             Center(child: Text("Team")),
           ],
-        )
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue
+                ),
+                child: Text("My Application"),
+              ),
+              ListTile(
+                title: const Text('Hide Side bar'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('Item 2'),
+                onTap: () {},
+              )
+            ],
+          ),
+          // backgroundColor: Colors.white10,
+        ),
       ),
     );
   }
-}
-
-Widget exploreTab(){
-  return Container(
-    child: Center(
-      child: Text('Explore World_!'),
-    ),
-  );
 }
 
 Widget DashBoardTab(){
@@ -82,4 +100,28 @@ Widget DashBoardTab(){
     child: CalculatorBasic(),
       
   );
+}
+
+class DialogMessage extends StatelessWidget{
+  const DialogMessage({super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(onPressed: () => showDialog<String>(
+      context: context,
+      builder: (BuildContext contxt) => AlertDialog(
+        title: const Text('Alert Dialog Title'),
+        content: const Text('Alert Dialog message description'),
+        actions: <Widget> [
+          TextButton(
+              onPressed: () => Navigator.pop(context, 'Cancel'),
+              child: const Text('Cansel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('OK')),
+
+        ],
+      )
+    ), child: const Text('Show Dialog'),);
+  }
 }

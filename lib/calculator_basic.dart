@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
-class CalculatorBasic extends StatelessWidget {
-  String userInput = " empty";
+class CalculatorBasic extends StatefulWidget {
+  @override
+  _CalculatorBasicState createState() => _CalculatorBasicState();
+}
+
+class _CalculatorBasicState extends State<CalculatorBasic> {
+  String userInput = "";
   String result = "0";
 
   List<String> buttonList = [
@@ -62,7 +68,7 @@ class CalculatorBasic extends StatelessWidget {
                   mainAxisSpacing: 5,
                 ),
                 itemBuilder: (BuildContext context, int index) {
-                  return CoustomButton(buttonList[index]);
+                  return CustomButton(buttonList[index]);
                 },
               ),
             ),
@@ -71,58 +77,88 @@ class CalculatorBasic extends StatelessWidget {
       ),
     );
   }
-}
 
-
-Widget CoustomButton(String text){
-  return InkWell(
-    splashColor: Color(0xFF1d2630),
-    onTap: () {
-      HandleButton(text);
-    },
-    child: Ink(
-      decoration: BoxDecoration(
-        color: getBgColor(text),
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withOpacity(0.1),
-            blurRadius: 4,
-            spreadRadius: 0.5,
-            offset: Offset(-3, -3)
-          )
-        ],
-      ),
-      child: Center(
-        child: Text(text,
-        style: TextStyle(
-          color: getColor(text),
-          fontSize: 30,
-          fontWeight: FontWeight.bold
+  Widget CustomButton(String text) {
+    return InkWell(
+      splashColor: Color(0xFF1d2630),
+      onTap: () {
+        HandleButton(text);
+      },
+      child: Ink(
+        decoration: BoxDecoration(
+          color: getBgColor(text),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withOpacity(0.1),
+              blurRadius: 4,
+              spreadRadius: 0.5,
+              offset: Offset(-3, -3),
+            )
+          ],
         ),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: getColor(text),
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
-    ),
-  );
-}
-
-getColor(String text){
-  if (text == "(" || text == ")" || text == "+" || text == "-" || text == "*" || text == "/" || text == "C" ){
-    return Color.fromARGB(255, 252, 100, 100);
+    );
   }
-  return Colors.white;
-}
 
-getBgColor(String text){
-  if (text == "AC"){
-    return Color.fromARGB(255, 252, 100, 100);
+  Color getColor(String text) {
+    if (text == "(" || text == ")" || text == "+" || text == "-" ||
+        text == "*" || text == "/" || text == "C") {
+      return Color.fromARGB(255, 252, 100, 100);
+    }
+    return Colors.white;
   }
-  if (text == "="){
-    return Color.fromARGB(255, 104, 204, 100);
+
+  Color getBgColor(String text) {
+    if (text == "AC") {
+      return Color.fromARGB(255, 252, 100, 100);
+    }
+    if (text == "=") {
+      return Color.fromARGB(255, 104, 204, 100);
+    }
+    return Color(0xFF1d2630);
   }
-  return Color(0xFF1d2630);
-}
 
-HandleButton(String text){
+  void HandleButton(String text) {
+    setState(() {
+      if (text == "AC") {
+        userInput = "";
+        result = "0";
+      } else if (text == "C") {
+        if (userInput.isNotEmpty) {
+          userInput = userInput.substring(0, userInput.length - 1);
+        }
+      }else if(text == "="){
+        result = Calculate();
+        if(result.endsWith(".0")){
+          result = result.replaceAll(".0", "");
+          return;
+        }
+      }
+      else {
+        userInput += text;
+      }
+    });
+  }
 
+  String Calculate(){
+    try{
+      var exp = Parser().parse(userInput);
+      var evalution = exp.evaluate(EvaluationType.REAL, ContextModel());
+
+      return evalution.toString();
+    }catch(e){
+      return "ERROR";
+    }
+  }
 }
